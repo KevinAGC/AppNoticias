@@ -36,6 +36,13 @@ class News {
     return false;
   }
 
+  bool get hasAuthor {
+    if (author != null) {
+      return true;
+    }
+    return false;
+  }
+
   factory News.fromJson(Map<String, dynamic> json) => News(
         author: json["author"],
         title: json["title"],

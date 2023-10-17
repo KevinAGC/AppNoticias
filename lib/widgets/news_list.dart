@@ -1,3 +1,4 @@
+import 'package:appnoticias/screens/details.dart';
 import 'package:flutter/material.dart';
 import 'package:appnoticias/models/models.dart';
 
@@ -12,6 +13,11 @@ class NewsList extends StatelessWidget {
       itemBuilder: (context, index) {
         final noticia = news[index];
         return ListTile(
+          onTap: () => Navigator.pushNamed(
+            context,
+            'details',
+            arguments: (noticia),
+          ),
           shape: const ContinuousRectangleBorder(
             //<-- SEE HERE
             side: BorderSide(width: 1),
