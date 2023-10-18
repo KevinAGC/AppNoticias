@@ -1,5 +1,7 @@
 import 'package:appnoticias/models/models.dart';
 import 'package:flutter/material.dart';
+import 'package:html_unescape/html_unescape.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DetailsScreen extends StatefulWidget {
   const DetailsScreen({super.key});
@@ -49,27 +51,26 @@ class TitleAuthorImage extends StatelessWidget {
           alignment: Alignment.topLeft,
           child: Text(
             noticia.hasAuthor ? noticia.author.toString() : noticia.source,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
             textAlign: TextAlign.left,
           ),
         ),
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           child: FadeInImage(
-              //height: 150,
               fit: BoxFit.fitHeight,
-              placeholder: AssetImage('assets/images/generic/loading.gif'),
+              placeholder:
+                  const AssetImage('assets/images/generic/loading.gif'),
               imageErrorBuilder: (context, error, stackTrace) {
                 return Image.asset(
                   'assets/images/generic/1.png',
-                  height: 150,
                 );
               },
               //image: NetworkImage(news.image.toString()),
               //AssetImage('assets/images/generic-news.png')
               image: noticia.hasPicture
                   ? NetworkImage(noticia.image.toString()) as ImageProvider
-                  : AssetImage('assets/images/generic-news.png')
+                  : const AssetImage('assets/images/generic/1.png')
 
               //image: const AssetImage('assets/no-image.jpg'),
               ),
@@ -78,11 +79,29 @@ class TitleAuthorImage extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           alignment: Alignment.topLeft,
           child: Text(
-            noticia.description,
-            style: TextStyle(fontSize: 18),
+            HtmlUnescape().convert(noticia.description),
+            style: const TextStyle(fontSize: 18),
             textAlign: TextAlign.left,
           ),
         ),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          alignment: Alignment.topLeft,
+          child: ElevatedButton(
+            child: const Text("Leer Noticia Completa"),
+            onPressed: () async {
+              Uri url = Uri.parse(noticia.url);
+              var urllaunchable = await canLaunchUrl(
+                  url); //canLaunch is from url_launcher package
+              if (urllaunchable) {
+                await launchUrl(
+                    url); //launch is from url_launcher package to launch URL
+              } else {
+                //print("URL can't be launched.");
+              }
+            },
+          ),
+        )
       ],
     );
   }
