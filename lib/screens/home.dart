@@ -1,4 +1,3 @@
-import 'package:appnoticias/widgets/news_list.dart';
 import 'package:flutter/material.dart';
 import 'package:appnoticias/providers/news_provider.dart';
 import 'package:appnoticias/widgets/widgets.dart';
