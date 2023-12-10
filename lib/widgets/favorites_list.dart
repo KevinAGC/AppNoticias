@@ -17,8 +17,7 @@ class _FavoritesListState extends State<FavoritesList> {
       future: AuthService().sendGetRequest(),
       builder: (BuildContext context,
           AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
-        return SizedBox(
-          height: 200,
+        return Expanded(
           child: ListView.builder(
             itemCount: snapshot.data!.length,
             itemBuilder: (context, index) {
@@ -77,23 +76,11 @@ class AlertFavorito extends StatelessWidget {
         ),
         TextButton(
           onPressed: () async {
-            print(fav["id"].toString());
-
-            FutureBuilder<String>(
-              future: AuthService().sendDeleteRequest(fav["id"].toString()),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  if (snapshot.hasError) {
-                    print('Error: ${snapshot.error}');
-                  } else {
-                    print('Deletion successful: ${snapshot.data}');
-                    Navigator.pop(context);
-                  }
-                }
-
-                return Container();
-              },
-            );
+            await AuthService().sendDeleteRequest(fav["id"].toString());
+            //Navigator.pop(context);
+            int count = 0;
+            Navigator.of(context).popUntil((_) => count++ >= 2);
+            Navigator.pushNamed(context, 'favorites');
           },
           child: Text(
             'Eliminar',
