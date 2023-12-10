@@ -16,16 +16,25 @@ class NewsPage extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.orange,
-        title: const Center(
-          child: Text('Noticias'),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.login_outlined),
-          onPressed: () {
-            authService.logout();
-            Navigator.pushReplacementNamed(context, 'login');
-          },
-        ),
+        title: const Text('Noticias'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.login_outlined),
+            onPressed: () {
+              authService.logout();
+              Navigator.pushReplacementNamed(context, 'login');
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.favorite_rounded),
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                'favorites',
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [

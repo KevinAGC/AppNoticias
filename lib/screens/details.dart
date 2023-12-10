@@ -1,4 +1,5 @@
 import 'package:appnoticias/models/models.dart';
+import 'package:appnoticias/services/services.dart';
 import 'package:flutter/material.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -15,8 +16,23 @@ class _DetailsScreenState extends State<DetailsScreen> {
   Widget build(BuildContext context) {
     final News noticia = ModalRoute.of(context)?.settings.arguments as News;
     return Scaffold(
-      appBar:
-          AppBar(backgroundColor: Colors.orange, title: Text(noticia.source)),
+      appBar: AppBar(
+        backgroundColor: Colors.orange,
+        title: Text(noticia.source),
+        leading: IconButton(
+          icon: const Icon(Icons.favorite),
+          onPressed: () async {
+            var result =
+                await AuthService().sendPostRequest(noticia.title, noticia.url);
+            showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                      title: const Text('Favoritas'),
+                      content: Text((result.toString())),
+                    ));
+          },
+        ),
+      ),
       body: CustomScrollView(
         slivers: [
           SliverList(
@@ -106,6 +122,7 @@ class TitleAuthorImage extends StatelessWidget {
     );
   }
 }
+
 /*
 Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),

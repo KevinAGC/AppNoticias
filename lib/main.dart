@@ -5,14 +5,7 @@ import 'package:provider/provider.dart';
 import 'providers/news_provider.dart';
 import 'providers/login_form_provider.dart';
 
-void main() => runApp(const AppState());
-
-class AppState extends StatelessWidget {
-  const AppState({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MultiProvider(
+void main() => runApp(MultiProvider(
       providers: [
         ChangeNotifierProvider(
           create: (_) => NewsProvider(),
@@ -27,8 +20,15 @@ class AppState extends StatelessWidget {
           lazy: false,
         )
       ],
-      child: const MyApp(),
-    );
+      child: const AppState(),
+    ));
+
+class AppState extends StatelessWidget {
+  const AppState({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MyApp();
   }
 }
 
@@ -46,7 +46,8 @@ class MyApp extends StatelessWidget {
         'register': (_) => RegisterScreen(),
         'home': (_) => NewsPage(),
         'details': (_) => const DetailsScreen(),
-        'checking': (_) => CheckAuthScreen()
+        'checking': (_) => CheckAuthScreen(),
+        'favorites': (_) => FavoritePage()
       },
     );
   }

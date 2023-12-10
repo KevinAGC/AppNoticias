@@ -5,67 +5,41 @@ import 'package:http/http.dart' as http;
 
 class AuthService extends ChangeNotifier {
   final String _baseUrl = 'loginpruebakg.somee.com';
-  //final String _firebaseToken = 'AIzaSyCD36g1c5N9WPp4PCmVwt2jEzdWIGtglso';
+  final storage = FlutterSecureStorage();
 
-  final storage = new FlutterSecureStorage();
-
-  // Si retornamos algo, es un error, si no, todo bien!
   Future<String?> createUser(String email, String password) async {
-    final Map<String, dynamic> authData = {
-      'email': email,
-      'password': password,
-      //'returnSecureToken': true
-    };
-
+    final authData = {'email': email, 'password': password};
     final url = Uri.http(_baseUrl, '/api/Cuentas/registrar');
 
-    final resp = await http.post(url,
-        headers: {"Content-Type": "application/json"},
-        body: json.encode(authData));
+    final resp = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: json.encode(authData),
+    );
 
-    final Map<String, dynamic> decodedResp = json.decode(resp.body);
+    final decodedResp = json.decode(resp.body);
 
     if (decodedResp.containsKey('token')) {
-      // Token hay que guardarlo en un lugar seguro
       await storage.write(key: 'token', value: decodedResp['token']);
-      // decodedResp['idToken'];
       return null;
     } else {
-      //ojo
       return decodedResp['error']['message'];
     }
   }
 
   Future<String?> login(String email, String password) async {
-    final Map<String, dynamic> authData = {
-      'email': email,
-      'password': password
-    };
+    final authData = {'email': email, 'password': password};
     final url = Uri.http(_baseUrl, '/api/Cuentas/login');
 
-    //final url2 = Uri.https(_baseUrl, '/Prueba/on');
+    final resp = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: json.encode(authData),
+    );
 
-    /*final resp2 = await http.get(url2, headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Accept': 'application/json'
-    });*/
-
-    final resp = await http.post(url,
-        headers: {"Content-Type": "application/json"},
-        body: json.encode(authData));
-
-    /*final resp = await http.post(url,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Accept': 'application/json'
-        },
-        body: json.encode(authData));*/
-
-    final Map<String, dynamic> decodedResp = json.decode(resp.body);
+    final decodedResp = json.decode(resp.body);
 
     if (decodedResp.containsKey('token')) {
-      // Token hay que guardarlo en un lugar seguro
-      // decodedResp['idToken'];
       await storage.write(key: 'token', value: decodedResp['token']);
       return null;
     } else {
@@ -73,12 +47,90 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  Future logout() async {
+  Future<void> logout() async {
     await storage.delete(key: 'token');
-    return;
   }
 
   Future<String> readToken() async {
     return await storage.read(key: 'token') ?? '';
+  }
+
+  Future<String> sendPostRequest(String title, String link) async {
+    final String apiUrl = 'http://192.168.1.92:5000/api/Cuentas/Favorito';
+
+    try {
+      Map<String, dynamic> postData = {
+        "userId": "2",
+        "title": title,
+        "link": link
+      };
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${await readToken()}',
+        },
+        body: jsonEncode(postData),
+      );
+
+      if (response.statusCode == 200) {
+        print('Response: ${response.body}');
+        return response.body.toString();
+      } else {
+        print('Request failed with status: ${response.statusCode}');
+        return response.body;
+      }
+    } catch (e) {
+      print('Error: $e');
+      rethrow;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> sendGetRequest() async {
+    final String apiUrl = 'http://192.168.1.92:5000/api/Cuentas/Favorito';
+
+    try {
+      final response = await http.get(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${await readToken()}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        List<Map<String, dynamic>> mapList =
+            List<Map<String, dynamic>>.from(json.decode(response.body));
+        return mapList;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print('Error: $e');
+      rethrow;
+    }
+  }
+
+  Future<String> sendDeleteRequest(String id) async {
+    final String apiUrl = 'http://192.168.1.92:5000/api/Cuentas/Favorito';
+    print(Uri.parse('$apiUrl/$id'));
+    try {
+      final response = await http.delete(
+        Uri.parse('$apiUrl/$id'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${await readToken()}',
+        },
+      );
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return response.body.toString();
+      } else {
+        return 'Request failed with status: ${response.statusCode}';
+      }
+    } catch (e) {
+      print('Error: $e');
+      return 'An error occurred: $e';
+    }
   }
 }
