@@ -64,7 +64,7 @@ class AlertFavorito extends StatelessWidget {
             Uri url = Uri.parse(fav["link"].toString());
             var urlLaunchable = await canLaunchUrl(url);
             if (urlLaunchable) {
-              await canLaunchUrl(url);
+              await launchUrl(url);
             } else {
               // Handle the case where the URL can't be launched.
             }

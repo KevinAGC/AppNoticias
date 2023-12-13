@@ -113,17 +113,26 @@ class _LoginForm extends StatelessWidget {
 
                             loginForm.isLoading = true;
 
-                            // TODO: validar si el login es correcto
-                            final String? errorMessage = await authService
-                                .login(loginForm.email, loginForm.password);
-
-                            if (errorMessage == null) {
-                              Navigator.pushReplacementNamed(context, 'home');
-                            } else {
-                              // TODO: mostrar error en pantalla
-                              // print( errorMessage );
-                              NotificationsService.showSnackbar(errorMessage);
-                              loginForm.isLoading = false;
+                            try {
+                              final String? errorMessage = await authService
+                                  .login(loginForm.email, loginForm.password);
+                              if (errorMessage == null) {
+                                Navigator.pushReplacementNamed(context, 'home');
+                              } else {
+                                // TODO: mostrar error en pantalla
+                                // print( errorMessage );
+                                /*NotificationsService.showSnackbar(errorMessage);
+                              loginForm.isLoading = false;*/
+                              }
+                            } on Exception catch (_) {
+                              Navigator.pushReplacementNamed(context, 'login');
+                              showDialog(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                        title: const Text('Error'),
+                                        content: const Text(
+                                            "Usuario o password incorrecto"),
+                                      ));
                             }
                           },
                     child: Container(

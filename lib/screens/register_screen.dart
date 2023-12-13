@@ -13,7 +13,7 @@ class RegisterScreen extends StatelessWidget {
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: Colors.blue,
+          backgroundColor: Colors.orange,
           title: const Text(
             "Registro",
             style: TextStyle(color: Colors.white),
@@ -56,10 +56,10 @@ class _LoginForm extends StatelessWidget {
                   autocorrect: false,
                   keyboardType: TextInputType.emailAddress,
                   cursorColor: Colors.amber,
-                  decoration: InputDecorations.authInputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'correo@gmail.com',
                     labelText: 'Email',
-                    prefixIcon: Icons.alternate_email_rounded,
+                    //prefixIcon: Icons.alternate_email_rounded,
                   ),
                   onChanged: (value) => loginForm.email = value,
                   validator: (value) {
@@ -79,15 +79,24 @@ class _LoginForm extends StatelessWidget {
                   autocorrect: false,
                   obscureText: true,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecorations.authInputDecoration(
-                      hintText: '*****',
-                      labelText: 'Password',
-                      prefixIcon: Icons.lock_outline),
+                  decoration: InputDecoration(
+                    errorMaxLines: 2,
+                    hintText: '*****',
+                    labelText: 'Password',
+                  ),
                   onChanged: (value) => loginForm.password = value,
                   validator: (value) {
-                    return (value != null && value.length >= 6)
-                        ? null
-                        : 'La contraseña debe de ser de 6 caracteres';
+                    String pattern =
+                        r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{6,}$';
+                    RegExp regExp = new RegExp(pattern);
+
+                    if (value != null && value.length < 6) {
+                      return 'La contraseña debe de ser de 6 caracteres';
+                    }
+                    if (regExp.hasMatch(value!)) {
+                      return null;
+                    }
+                    return 'La contraseña debe contener mayúsculas, minúsculas, números y caracteres especiales';
                   },
                 ),
               ),
@@ -115,12 +124,18 @@ class _LoginForm extends StatelessWidget {
                             final String? errorMessage =
                                 await authService.createUser(
                                     loginForm.email, loginForm.password);
+                            print(errorMessage);
 
                             if (errorMessage == null) {
                               Navigator.pushReplacementNamed(context, 'home');
                             } else {
                               // TODO: mostrar error en pantalla
-                              print(errorMessage);
+                              showDialog(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                        title: const Text('Error'),
+                                        content: Text(errorMessage),
+                                      ));
                               loginForm.isLoading = false;
                             }
                           },
@@ -128,7 +143,7 @@ class _LoginForm extends StatelessWidget {
                         padding:
                             EdgeInsets.symmetric(horizontal: 80, vertical: 15),
                         child: Text(
-                          loginForm.isLoading ? 'Espere' : 'Ingresar',
+                          loginForm.isLoading ? 'Espere' : 'Registrar',
                           style: TextStyle(color: Colors.white),
                         ))),
               ),
@@ -140,7 +155,7 @@ class _LoginForm extends StatelessWidget {
                           pageBuilder: (_, __, ___) => LoginScreen(),
                           transitionDuration: Duration(seconds: 0)));
                 },
-                child: Text('Ingresar'),
+                child: Text('Iniciar sesión'),
               )
             ],
           ),

@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 class AuthService extends ChangeNotifier {
   final String _baseUrl = 'loginpruebakg.somee.com';
   final storage = FlutterSecureStorage();
-
+  bool success = false;
   Future<String?> createUser(String email, String password) async {
     final authData = {'email': email, 'password': password};
     final url = Uri.http(_baseUrl, '/api/Cuentas/registrar');
@@ -18,6 +18,12 @@ class AuthService extends ChangeNotifier {
     );
 
     final decodedResp = json.decode(resp.body);
+    print(resp.body.toString());
+    if (resp.body.toString().contains('token')) {
+      success = true;
+    } else {
+      return 'El correo ingresado ya esta registrado!';
+    }
 
     if (decodedResp.containsKey('token')) {
       await storage.write(key: 'token', value: decodedResp['token']);
@@ -56,7 +62,7 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<String> sendPostRequest(String title, String link) async {
-    final String apiUrl = 'http://192.168.1.92:5000/api/Cuentas/Favorito';
+    final String apiUrl = 'http://loginpruebakg.somee.com/api/Cuentas/Favorito';
 
     try {
       Map<String, dynamic> postData = {
@@ -87,7 +93,7 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<List<Map<String, dynamic>>> sendGetRequest() async {
-    final String apiUrl = 'http://192.168.1.92:5000/api/Cuentas/Favorito';
+    final String apiUrl = 'http://loginpruebakg.somee.com/api/Cuentas/Favorito';
 
     try {
       final response = await http.get(
@@ -112,7 +118,7 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<String> sendDeleteRequest(String id) async {
-    final String apiUrl = 'http://192.168.1.92:5000/api/Cuentas/Favorito';
+    final String apiUrl = 'http://loginpruebakg.somee.com/api/Cuentas/Favorito';
     print(Uri.parse('$apiUrl/$id'));
     try {
       final response = await http.delete(

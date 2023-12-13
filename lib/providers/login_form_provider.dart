@@ -8,7 +8,6 @@ class LoginFormProvider extends ChangeNotifier {
 
   set email(String val) {
     _email = val;
-    print("eso tilin");
     notifyListeners();
   }
 
